@@ -1,0 +1,65 @@
+@import "tailwindcss";
+
+/* Dark mode is a `dark` class on <html>; every colour below switches with it. */
+@custom-variant dark (&:where(.dark, .dark *));
+
+@theme {
+  --font-display: "Bricolage Grotesque", sans-serif;
+  --font-sans: "DM Sans", system-ui, sans-serif;
+}
+
+@theme inline {
+  --color-ink: var(--ink);
+  --color-on-ink: var(--on-ink);
+  --color-mist: var(--mist);
+  --color-surface: var(--surface);
+}
+
+:root {
+  --ink: #161b33;
+  --on-ink: #ffffff;
+  --mist: #edf0f7;
+  --surface: #ffffff;
+  --dot: #cdd3e6;
+}
+
+.dark {
+  --ink: #e8eaf8;
+  --on-ink: #0e1124;
+  --mist: #0e1124;
+  --surface: #1a1e3b;
+  --dot: #1f2444;
+}
+
+body {
+  @apply bg-mist font-sans text-ink antialiased;
+  background-image: radial-gradient(var(--dot) 1px, transparent 1px);
+  background-size: 22px 22px;
+}
+
+.pop-in {
+  animation: pop 0.18s ease-out;
+}
+@keyframes pop {
+  from {
+    opacity: 0;
+    transform: translateY(8px) scale(0.97);
+  }
+}
+
+.toast-timer {
+  transform-origin: left;
+  animation: shrink linear forwards;
+}
+@keyframes shrink {
+  to {
+    transform: scaleX(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pop-in,
+  .toast-timer {
+    animation: none;
+  }
+}
