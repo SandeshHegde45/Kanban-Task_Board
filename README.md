@@ -1,36 +1,141 @@
-# Kanban Task Board (v1.5.0)
+# Kanban Task Board
 
-Vite + React, Tailwind CSS v4, React Router, React Hook Form, Redux Toolkit, lucide-react.
+A lightweight Kanban workflow app built with Vite + React, Redux Toolkit, React Router, and modern component-based UI design. The project is structured around multiple workspaces/projects, task management, filters, notifications, and a mock authentication flow with local persistence.
 
-## Run
-    npm install
-    npm run dev
+## Overview
 
-## Structure
-    src/
-      app/store.js                  Redux store + LocalStorage sync
-      routes/                       AppRoute (route table), ProtectedRoute, PublicRoute
-      features/users/               directory of accounts (for members and assignees)
-      features/notifications/       slice, NotificationBell, announceUnread
-      features/workspace/           seed data + one-time legacy migration
-      features/toast/               toastSlice + ToastHost (undo)
-      features/theme/               themeSlice, storage, ThemeToggle
-      features/projects/            projectSlice, storage, ProjectsPage, ProjectCard, ProjectForm
-      features/auth/                authService (mock backend), authSlice, Login/Register pages, UserMenu
-      shared/                       Button, IconButton, Modal, EmptyState, SegmentedControl, date utils
-      features/tasks/               slice, storage, constants, BoardPage (/projects/:projectId), TaskColumn, TaskCard, TaskForm, BoardHeader
-      features/filters/             slice + FilterBar
+This app lets users:
 
-## Decisions
-- Redux holds tasks and filters. Filtered lists are derived with useMemo, never stored.
-- The store subscribes once and writes tasks to LocalStorage on change.
-- Drag and drop uses native HTML5 events. Arrow buttons cover touch devices.
-- First visit shows sample tasks; after that LocalStorage is the source of truth.
-- Auth is a LocalStorage mock in `features/auth/authService.js`. Replace its four functions (`register`, `login`, `logout`, `getSession`) with API calls and nothing else changes.
-- Tasks are stored per user id, so two accounts on one browser never see each other's boards.
-- Tasks carry a `projectId`. Projects and tasks are two slices; deleting a project is handled by the task slice via `extraReducers`.
-- Undo: `removeTask` (a thunk) deletes the task, then shows a toast whose `action` is a plain `restoreTask` action holding the task and its index. Only one toast shows at a time.
-- Dark mode: a `dark` class on `<html>` swaps CSS variables; components use `ink`, `mist` and `surface` tokens. A small inline script in `index.html` sets the class before first paint.
-- Sorting: `sortTasks` (features/tasks/taskSort.js) is a pure function applied after filtering. The chosen sort lives in the filters slice, so it survives clearing filters and switching projects, but not a page refresh.
-- Collaboration is a LocalStorage mock: projects, tasks and notifications are shared lists, so every account on the same browser can collaborate. Syncing across devices needs a real backend.
-- Rules (owner manages, assignee moves their own tasks) are enforced in the thunks (`taskThunks`, `projectThunks`) and mirrored in the UI by hiding controls. With a backend the same checks must also run on the server.
+- create and manage multiple projects
+- organize tasks across Kanban columns
+- assign tasks to team members
+- filter and sort tasks
+- receive project/task notifications
+- switch between light and dark themes
+- persist data locally in the browser using LocalStorage
+
+The app is designed as a frontend-focused project management dashboard and is meant to be extended with a real backend later.
+
+## Tech Stack
+
+- React 19
+- Vite
+- Redux Toolkit
+- React Router
+- Tailwind CSS v4
+- React Hook Form
+- Lucide React
+- LocalStorage-based persistence for demo data
+
+## Features
+
+- Project dashboard with create/edit/delete actions
+- Individual Kanban board per project
+- Task creation, editing, deletion, and movement between columns
+- Member/assignee-aware task flows
+- Filter bar for search and status-based task filtering
+- Sort options for prioritized task viewing
+- Notification center and unread notification tracking
+- Theme toggle with light/dark mode
+- Client-side auth flow (login/register mock session)
+- Undo support for task deletions via toast actions
+- Responsive, modern UI for desktop and smaller screens
+
+## Project Structure
+
+```text
+src/
+  app/
+    store.js                   Redux store and persistence wiring
+  routes/
+    AppRoute.jsx               Route definitions and guards
+    ProtectedRoute.jsx
+    PublicRoute.jsx
+  features/
+    auth/                      login/register flow, mock auth service, user menu
+    filters/                   filter state and filter UI
+    notifications/             notifications slice and components
+    projects/                  project logic, selectors, pages, cards, forms
+    tasks/                     kanban board logic, task columns/cards, sorting
+    theme/                     theme state and persistence
+    toast/                     toast host and undo actions
+    users/                     user/member data
+    workspace/                 seed data and migration helpers
+  shared/
+    components/                reusable UI primitives
+    utils/                    validation and date utilities
+```
+
+## App Behavior
+
+- Redux keeps app state centralized and reactive.
+- Tasks, projects, and notifications are saved to LocalStorage when state changes.
+- The app boots with demo/project seed data on first visit.
+- Auth is mocked through a local session layer in `features/auth/authService.js`.
+- Each user account keeps its own task data in the browser, while shared project/task lists can be viewed across accounts on the same device.
+- Project ownership and task assignment rules are enforced in thunks and mirrored in the UI.
+
+## Getting Started
+
+### Prerequisites
+
+- Node.js 18+ recommended
+- npm
+
+### Install dependencies
+
+```bash
+npm install
+```
+
+### Run the app locally
+
+```bash
+npm run dev
+```
+
+This starts the Vite development server, usually at:
+
+```text
+http://localhost:5173
+```
+
+### Build for production
+
+```bash
+npm run build
+```
+
+### Preview production build
+
+```bash
+npm run preview
+```
+
+## Typical Usage
+
+1. Register or log in with a local mock account.
+2. Create a new project from the dashboard.
+3. Open the project board and create tasks in columns like To Do, In Progress, and Done.
+4. Edit task details, assign members, and move tasks across columns.
+5. Use filters and sorting to focus on specific tasks.
+6. Toggle dark mode from the interface as needed.
+
+## Notes
+
+- This is a frontend-first demonstration app.
+- Authentication and persistence are intentionally simple and local to the browser.
+- To connect the app to a real backend, replace the mock auth service and update the local persistence layer with API calls.
+
+## Development Notes (from the project)
+
+- Redux holds tasks and filters; filtered lists are derived, not stored.
+- The store subscribes once and writes app data to LocalStorage on change.
+- Drag and drop uses native HTML5 drag events with touch-friendly arrow controls.
+- Sorting is handled through a pure helper in `features/tasks/taskSort.js`.
+- Dark mode applies a `dark` class to the root HTML element and uses design tokens for theming.
+- Undo actions for task deletion are implemented via a toast system.
+
+## License
+
+This project is a demonstration / learning project and does not include a formal production license unless added later.
