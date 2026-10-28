@@ -1,20 +1,21 @@
 import { Plus } from "lucide-react";
 import AvatarStack from "../../../shared/components/AvatarStack";
 import Button from "../../../shared/components/Button";
-import { getProjectColor } from "../../projects/constants";
+import { getProjectColor, getProjectIcon } from "../../projects/constants";
 import { STATUSES } from "../constants";
 
 export default function BoardHeader({ project, tasks, members, owner, isOwner, onAdd, onMembers }) {
   const total = tasks.length;
   const count = (status) => tasks.filter((t) => t.status === status).length;
   const color = getProjectColor(project.color);
+  const { Icon } = getProjectIcon(project.icon);
 
   return (
     <header className="flex flex-col gap-6 sm:flex-row sm:items-end sm:justify-between">
       <div className="w-full max-w-xl">
         <div className="flex items-center gap-4">
-          <span className={`grid size-12 shrink-0 place-items-center rounded-2xl font-display text-xl font-extrabold text-white ${color.tile}`}>
-            {project.name.charAt(0).toUpperCase()}
+          <span className={`grid size-12 shrink-0 place-items-center rounded-2xl text-white ${color.tile}`} aria-hidden="true">
+            <Icon size={23} strokeWidth={2} />
           </span>
           <h1 className="font-display text-4xl font-extrabold tracking-tight sm:text-5xl">{project.name}</h1>
         </div>

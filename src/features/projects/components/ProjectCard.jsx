@@ -3,8 +3,9 @@ import { Link } from "react-router";
 import { Pencil, Trash2 } from "lucide-react";
 import AvatarStack from "../../../shared/components/AvatarStack";
 import IconButton from "../../../shared/components/IconButton";
-import { getProjectColor } from "../constants";
+import { getProjectColor, getProjectIcon } from "../constants";
 import { isOwner } from "../permissions";
+import { STATUSES } from "../../tasks/constants";
 
 export default function ProjectCard({ project, tasks, onEdit, onDelete }) {
   const me = useSelector((s) => s.auth.user);
@@ -14,14 +15,15 @@ export default function ProjectCard({ project, tasks, onEdit, onDelete }) {
   const owner = isOwner(project, me);
   const done = tasks.filter((t) => t.status === "completed").length;
   const mine = tasks.filter((t) => t.assigneeId === me.id && t.status !== "completed").length;
-  const percent = tasks.length ? Math.round((done / tasks.length) * 100) : 0;
+  const count = (status) => tasks.filter((t) => t.status === status).length;
   const color = getProjectColor(project.color);
+  const { Icon } = getProjectIcon(project.icon);
 
   return (
     <article className="relative flex flex-col rounded-[28px] bg-surface p-6 shadow-sm ring-1 ring-ink/5 transition hover:shadow-md focus-within:ring-2 focus-within:ring-ink">
       <div className="flex items-start justify-between">
-        <span className={`grid size-12 place-items-center rounded-2xl font-display text-xl font-extrabold text-white ${color.tile}`}>
-          {project.name.charAt(0).toUpperCase()}
+        <span className={`grid size-12 place-items-center rounded-2xl text-white ${color.tile}`} aria-hidden="true">
+          <Icon size={23} strokeWidth={2} />
         </span>
         <div className="relative z-10 flex items-center gap-1 text-ink/40">
           {owner ? (
@@ -44,10 +46,18 @@ export default function ProjectCard({ project, tasks, onEdit, onDelete }) {
       <p className="mt-1 line-clamp-2 min-h-10 text-sm text-ink/60">{project.description || "No description"}</p>
 
       <div className="mt-5">
-        <div className="h-2 overflow-hidden rounded-full bg-mist">
-          <div className={`h-full rounded-full transition-all duration-500 ${color.tile}`} style={{ width: `${percent}%` }} />
-        </div>
-        <p className="mt-2 text-xs text-ink/60">{tasks.length ? `${done} of ${tasks.length} tasks done` : "No tasks yet"}</p>
+        <p className="text-xs text-ink/60">{tasks.length ? `${done} of ${tasks.length} tasks completed` : "No tasks yet"}</p>
+        {tasks.length > 0 && (
+          <div className="mt-4 flex h-3 overflow-hidden rounded-full bg-surface ring-1 ring-ink/10" role="img" aria-label="Task progress by status">
+            {STATUSES.map((status) => (
+              <div
+                key={status.value}
+                className={`${status.bar} transition-all duration-500`}
+                style={{ width: `${(count(status.value) / tasks.length) * 100}%` }}
+              />
+            ))}
+          </div>
+        )}
       </div>
 
       <div className="mt-4 flex items-center justify-between gap-2">
